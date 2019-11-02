@@ -3,7 +3,8 @@
 $Driver
 
 function startBrowser {
-    $script:Driver = Start-SeChrome -Arguments @('Incognito','start-maximized')
+    Param([string] $startUrl)
+    $script:Driver = Start-SeChrome -StartUrl $startUrl -Arguments @('Incognito','start-maximized')
 }
 
 function closeBrowser {
@@ -26,3 +27,5 @@ function listenForElement {
     Param([Parameter(mandatory=$true)][string] $elementName)
     Find-SeElement -Driver $Driver -Wait -Timeout 10 -Name $elementName
 }
+
+startBrowser "http://www.bbc.com"

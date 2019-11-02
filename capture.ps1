@@ -36,7 +36,7 @@ function captureUrl {
     )
 
     # first open the browser and wait for selenium to have control
-    startBrowser
+    startBrowser "https://www.microsoft.com/en-us/"
 
     $recordLength = 5
     $interimFileName_Raw = $output + ".raw.mp4"
@@ -92,6 +92,9 @@ function main {
     Write-Host -ForegroundColor Green "`nProcess Complete. " -NoNewline
     Write-Host "Video file here: " -NoNewline
     Write-Host $filenameStitched -ForegroundColor Yellow
+
+    # open folder and highlight file
+    explorer /select,$filenameStitched
 }
 
 main;
