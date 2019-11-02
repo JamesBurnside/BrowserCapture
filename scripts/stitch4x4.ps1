@@ -41,7 +41,7 @@ function stitch {
     printFileNameToConsole -positionName "output file video name: " -fileName $output
 
     Write-Host "Stitching... (ffmpeg doing the work)"
-    #ffmpeg -i $topleft -i $topright -i $bottomleft -i $bottomright -filter_complex "[0:v][1:v]hstack[t];[2:v][3:v]hstack[b];[t][b]vstack[v]" -map "[v]" -shortest $output
+    ffmpeg -loglevel error -i $topleft -i $topright -i $bottomleft -i $bottomright -filter_complex "[0:v][1:v]hstack[t];[2:v][3:v]hstack[b];[t][b]vstack[v]" -map "[v]" -shortest $output
     Write-Host -ForegroundColor Green "Stitch complete"
 
     if ($slowAsWell -eq "true") {

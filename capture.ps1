@@ -1,24 +1,17 @@
-#Requires -Modules Selenium
-
 # Param(
 #     # output file
-#     [Parameter(Mandatory=$true)]
 #     [Alias("o")]
 #     [string] $output,
 #     # first website
-#     [Parameter(Mandatory=$true)]
 #     [Alias("u1")]
 #     [string] $url1,
 #     # second website
-#     [Parameter(Mandatory=$true)]
 #     [Alias("u2")]
 #     [string] $url2,
 #     # third website
-#     [Parameter(Mandatory=$true)]
 #     [Alias("u3")]
 #     [string] $url3,
 #     # fourth website
-#     [Parameter(Mandatory=$true)]
 #     [Alias("u4")]
 #     [string] $url4
 # )
@@ -38,7 +31,8 @@ catch {
 function captureUrl {
     Param(
         [Parameter(mandatory=$true)][string] $url,
-        [Parameter(mandatory=$true)][string] $output
+        [Parameter(mandatory=$true)][string] $output,
+        [Parameter(mandatory=$true)][string] $overlayText
     )
 
     # first open the browser and wait for selenium to have control
@@ -62,9 +56,12 @@ function captureUrl {
 
     Write-Host "Applying overlays"
     $interimFileName_Overlays = $output + ".overlays.mp4"
-    $recordProcess = applyOverlaysOnTopOfVideo -in $interimFileName_Raw -out $interimFileName_Overlays -text "CSR"
+    $recordProcess = applyOverlaysOnTopOfVideo -in $interimFileName_Raw -out $output -text $overlayText #update output once there are more steps
     Wait-Process -Id $recordProcess.Id
     Write-Host "Overlays complete." -ForegroundColor Green
+
+    # clean up the browser
+    closeBrowser
 }
 
 function main {
@@ -84,11 +81,10 @@ function main {
     $filenameStitched = $outputDir+"\comparison.mp4"
 
     # capture website runs
-    captureUrl "https://int.msn.com/ssr/?item=spalink:20191022.1&cache=warm" $fileName1
-    # capture -o $fileName1
-    # capture -o $fileName2
-    # capture -o $fileName3
-    # capture -o $fileName4
+    captureUrl "https://int.msn.com/ssr/?item=spalink:20191024.8&csr=true" $fileName1 "CSR"
+    captureUrl "https://int.msn.com/ssr/?item=spalink:20191024.8&prerender=true" $fileName2 "SSR Prerender"
+    captureUrl "https://int.msn.com/ssr/?item=spalink:20191024.8&delayed=true&prerender=true" $fileName3 "DSSR Prerender"
+    captureUrl "https://int.msn.com/ssr/?item=spalink:20191024.8&delayed=true&cache=warm" $fileName4 "DSSR Warm Cache"
 
     # stitch runs togather
     stitch -tl $fileName1 -tr $fileName2 -bl $fileName3 -br $fileName4 -o $filenameStitched

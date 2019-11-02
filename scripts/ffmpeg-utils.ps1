@@ -1,7 +1,6 @@
 
 function startInNewProc {
     Param ([Parameter(mandatory=$true)][string]$cmd)
-    Write-Host $cmd
     return Start-Process powershell -NoNewWindow -PassThru $cmd
 }
 
@@ -29,7 +28,6 @@ function applyOverlaysOnTopOfVideo {
         $fontDir = $assetsFolder+"\fonts"
         $fontFile = $fontDir+"\Gidole-Regular.ttf";
         $fontFile = $fontFile -replace '[\\:]','\$&' # do some escaping
-        Write-Host $fontFile 
         startInNewProc "ffmpeg -loglevel error -i '$in' -vf drawtext=\`"fontfile='$fontFile': text='$text': fontcolor=white: fontsize=110: box=1: boxcolor=black@0.7: boxborderw=5: x=(w-tw)/2: y=(h-th)*0.9\`" '$out'"
     }
 }
