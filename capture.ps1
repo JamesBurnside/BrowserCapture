@@ -24,7 +24,7 @@ try {
     . ("$ScriptDirectory\stitch4x4.ps1");
 }
 catch {
-    Write-Error "Error while loading supporting PowerShell Scripts";
+    Write-Error "Error while loading supporting PowerShell Scripts:`n$_.Exception.Message";
     exit;
 }
 
