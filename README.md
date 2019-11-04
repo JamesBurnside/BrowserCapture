@@ -2,13 +2,13 @@
 
 ## Description
 Quick powershell scripts to capture different urls and stitch them side by side.  
-This auto adds decals include overlay text and markers to indicate TTFB (time to first byte), TTVR (time to visually ready) and TTI (time to interactive).
+This auto adds decals including overlay text and markers to indicate TTFB (time to first byte), TTVR (time to visually ready) and TTI (time to interactive).
 
 ## Prerequisits
 * Ensure selenium package is installed:  
 `> Install-Module Selenium`
 * Ensure chrome is installed
-* Ensure ffmpeg is installed
+* Ensure ffmpeg is installed (see below if not installed)
 
 ### Setting up ffmpeg
 * Grab a latest build from: https://ffmpeg.zeranoe.com/builds/
