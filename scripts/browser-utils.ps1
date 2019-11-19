@@ -23,9 +23,17 @@ function loadUrl {
     Enter-SeUrl $url -Driver $Driver
 }
 
-function listenForElement {
+function listenForElementByName {
     Param([Parameter(mandatory=$true)][string] $elementName)
     Find-SeElement -Driver $Driver -Wait -Timeout 10 -Name $elementName
 }
 
-startBrowser "http://www.bbc.com"
+function listenForElementById {
+    Param([Parameter(mandatory=$true)][string] $elementId)
+    Find-SeElement -Driver $Driver -Wait -Timeout 10 -Id $elementId
+}
+
+function listenForElementByClass {
+    Param([Parameter(mandatory=$true)][string] $elementClass)
+    Find-SeElement -Driver $Driver -Wait -Timeout 10 -Class $elementClass
+}
