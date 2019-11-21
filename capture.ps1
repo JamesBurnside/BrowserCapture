@@ -61,7 +61,12 @@ function captureUrl {
     
     Write-Host "Starting record. Saving output to: " -NoNewline
     Write-Host $interimFileName_Raw -ForegroundColor Yellow
+    $minutes = [double](Get-Date -Format mm)
+    $seconds = [double](Get-Date -Format ss)
+    $milliseconds = [double](Get-Date -Format 0.fff)
+    $StopWatchStartTime = $minutes*60 + $seconds + $milliseconds
     $StopWatch1.Start()
+
     $recordProcess = recordPrimaryMonitor -output $interimFileName_Raw -captureLength $recordLength
 
     Start-Sleep 2 # arbitrary delay for the screen recording to actually kick in
@@ -87,9 +92,34 @@ function captureUrl {
     # $totalElapsedTime = $StopWatch1.Elapsed.TotalSeconds;
     Write-Host "Recording complete." -ForegroundColor Green
 
+    $interimFileName_Raw_Esc = $interimFileName_Raw -replace '[\\]','\$&' # do some escaping
+    Write-Host $interimFileName_Raw_Esc
+
+    # strip to just mmss.fff (TODO: should do hours as well really...)
+    $recordingStartTime = wmic datafile where "name='$interimFileName_Raw_Esc'" get creationdate | findstr /brc:[0-9]
+    $recordingStartTime = $recordingStartTime.Remove(0,10) # get just minutes onwards
+    $recordingStartTime = $recordingStartTime.SubString(0,8) # remove trailing except 3 millisecond digits
+    $minutes = [double]($recordingStartTime.SubString(0,2))
+    $seconds = [double]($recordingStartTime.SubString(2,2))
+    $milliseconds = [double]("0."+$recordingStartTime.SubString(5,3))
+
+    Write-Host "ffmpeg started at: $StopWatchStartTime"
+
+    $recordingStartTime = $minutes*60 + $seconds + $milliseconds
+    Write-Host "Recording started at: $recordingStartTime"
+
+    $ffmpegSetupTime = $recordingStartTime - $StopWatchStartTime - 0.5
+    Write-Host "ffmpeg setup time was: $ffmpegSetupTime"
+
+    Write-Host "`nTrimming video per ffmpeg startup time"
+    $interimFileName_Trimmed = "$output.trimmed.mp4"
+    ffmpeg -i $interimFileName_Raw -loglevel error -ss "00:00:$ffmpegSetupTime" -async 1 $interimFileName_Trimmed
+    Write-Host "Trimming complete." -ForegroundColor Green
+
     # Write-Host "Applying overlays"
     # $interimFileName_Overlays = $output + ".overlays.mp4"
-    $recordProcess = applyOverlaysOnTopOfVideo -in $interimFileName_Raw -out "$output.mp4" -text $overlayText #update output once there are more steps
+    Write-Host "`nApplying video overlays"
+    $recordProcess = applyOverlaysOnTopOfVideo -in $interimFileName_Trimmed -out "$output.mp4" -text $overlayText #update output once there are more steps
     Wait-Process -Id $recordProcess.Id
     Write-Host "Overlays complete." -ForegroundColor Green
 
