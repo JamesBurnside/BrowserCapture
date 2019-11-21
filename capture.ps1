@@ -1,35 +1,26 @@
 Param(
-    # first website
-    [Alias("u1")]
-    [string] $url1,
-    # first textforcapture
-    [Alias("t1")]
-    [string] $text1,
+    # options to capture
+    [bool] $csr = 0,
+    [bool] $ssr = 0,
+    [bool] $dssrcold = 0,
+    [bool] $dssrwarm = 0
+)
 
-    # second website
-    [Alias("u2")]
-    [string] $url2,
-    # second textforcapture
-    [Alias("t2")]
-    [string] $text2,
+class captureOption {
+    [string]$url
+    [string]$text
 
-    # third website
-    [Alias("u3")]
-    [string] $url3,
-    # third textforcapture
-    [Alias("t3")]
-    [string] $text3,
+    captureOption([string]$url, [string]$text) {
+        $this.url = $url
+        $this.text = $text
+    }
+}
 
-    # fourth website
-    [Alias("u4")]
-    [string] $url4,
-    # fourth textforcapture
-    [Alias("t4")]
-    [string] $text4,
-
-    # output file
-    [Alias("o")]
-    [string] $output
+$availableCaptureOptions = (
+    @([captureOption]::new("https://int.msn.com/ssr/?item=spalink:20191118.147&csr=true", "CSR")),
+    @([captureOption]::new("https://int.msn.com/ssr/?item=spalink:20191118.147&prerender=true", "SSR Prerender")),
+    @([captureOption]::new("https://int.msn.com/ssr/?item=spalink:20191118.147&delayed=true", "DSSR Cold Cache")),
+    @([captureOption]::new("https://int.msn.com/ssr/?item=spalink:20191118.147&delayed=true&cache=warm", "DSSR Warm Cache"))
 )
 
 # Load scripts
@@ -185,7 +176,7 @@ function capture4x4 {
     captureUrl $url3 $fileName3 $text3
     captureUrl $url4 $fileName4 $text4
 
-    # stitch runs togather
+    # stitch runs together
     stitch4x4 -tl "$fileName1.mp4" -tr "$fileName2.mp4" -bl "$fileName3.mp4" -br "$fileName4.mp4" -o $output
 }
 
@@ -202,36 +193,24 @@ function main {
     New-Item -ItemType Directory -Force -Path $interimFileDir | out-null
     Write-Host "Interim Files Directory Created: $interimFileDir";
 
+    $output = $outputDir+"\comparison.mp4"
+
+    $choosenCaptureOptions = @()
+    If ($csr) { $choosenCaptureOptions += $availableCaptureOptions[0] }
+    If ($ssr) { $choosenCaptureOptions += $availableCaptureOptions[1] }
+    If ($dssrcold) { $choosenCaptureOptions += $availableCaptureOptions[2] }
+    If ($dssrwarm) { $choosenCaptureOptions += $availableCaptureOptions[3] }
+
     # check if doing 2x2 or 4x4 or the default
-    $captureOption = "4x4";
-    If ($url1 -And $url2 -And $url3 -And $url4) {
-        $captureOption = "4x4"
-    } ElseIf ($url1 -And $url2) {
-        $captureOption = "2x2";
-    } Else {
-        # doing the default 4x4, set the urls here:
-        $url1 = "https://int.msn.com/ssr/?item=spalink:20191118.147&csr=true"
-        $text1 = "CSR"
-
-        $url2 = "https://int.msn.com/ssr/?item=spalink:20191118.147&prerender=true"
-        $text2 = "SSR Prerender"
-
-        $url3 = "https://int.msn.com/ssr/?item=spalink:20191118.147&delayed=true"
-        $text3 = "DSSR Cold Cache"
-
-        $url4 = "https://int.msn.com/ssr/?item=spalink:20191118.147&delayed=true&cache=warm"
-        $text4 = "DSSR Warm Cache"
+    If ($choosenCaptureOptions.Count -eq 2) {
+        capture2x2 $interimFileDir $choosenCaptureOptions[0].url $choosenCaptureOptions[0].text $choosenCaptureOptions[1].url $choosenCaptureOptions[1].text $output
     }
-
-    If (-Not $output) {
-        $output = $outputDir+"\comparison.mp4"
+    ElseIf ($choosenCaptureOptions.Count -eq 4) {
+        capture2x2 $interimFileDir $choosenCaptureOptions[0].url $choosenCaptureOptions[0].text $choosenCaptureOptions[1].url $choosenCaptureOptions[1].text $choosenCaptureOptions[2].url $choosenCaptureOptions[2].text $choosenCaptureOptions[3].url $choosenCaptureOptions[3].text $output
     }
-
-    If ($captureOption -eq "2x2") {
-        capture2x2 $interimFileDir $url1 $text1 $url2 $text2 $output
-    }
-    ElseIf ($captureOption -eq "4x4") {
-        capture4x4 $interimFileDir $url1 $text1 $url2 $text2 $url3 $text3 $url4 $text4 $output
+    Else {
+        Write-Error "Number of capture options must be 2 or 4"
+        return
     }
 
     # create a slow output also
