@@ -6,7 +6,33 @@ function printFileNameToConsole {
     Write-Host $fileName -ForegroundColor Yellow
 }
 
-function stitch {
+function stitch2x2 {
+    Param(
+        # left file in 4x4
+        [Parameter(Mandatory=$true)]
+        [Alias("l")]
+        $left,
+        # top right file in 4x4
+        [Parameter(Mandatory=$true)]
+        [Alias("r")]
+        $right,
+        # output file
+        [Parameter(Mandatory=$true)]
+        [Alias("o")]
+        $output
+    )
+
+    Write-Host "`n===Stitching files==="
+    printFileNameToConsole -positionName "left video file: " -fileName $left
+    printFileNameToConsole -positionName "right video file: " -fileName $right
+    printFileNameToConsole -positionName "output file video name: " -fileName $output
+
+    Write-Host "Stitching... (ffmpeg doing the work)"
+    ffmpeg -loglevel error -i $left -i $right -filter_complex hstack -shortest $output
+    Write-Host -ForegroundColor Green "Stitch complete"
+}
+
+function stitch4x4 {
     Param(
         # top left file in 4x4
         [Parameter(Mandatory=$true)]

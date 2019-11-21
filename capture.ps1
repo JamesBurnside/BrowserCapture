@@ -21,7 +21,7 @@ $ScriptDirectory = (Split-Path -Path $MyInvocation.MyCommand.Definition -Parent)
 try {
     . ("$ScriptDirectory\browser-utils.ps1");
     . ("$ScriptDirectory\ffmpeg-utils.ps1");
-    . ("$ScriptDirectory\stitch4x4.ps1");
+    . ("$ScriptDirectory\stitch.ps1");
 }
 catch {
     Write-Error "Error while loading supporting PowerShell Scripts:`n$_.Exception.Message";
@@ -111,7 +111,7 @@ function main {
 
     # stitch runs togather
     $filenameStitched = $outputDir+"\comparison.mp4"
-    stitch -tl "$fileName1.mp4" -tr "$fileName2.mp4" -bl "$fileName3.mp4" -br "$fileName4.mp4" -o $filenameStitched
+    stitch4x4 -tl "$fileName1.mp4" -tr "$fileName2.mp4" -bl "$fileName3.mp4" -br "$fileName4.mp4" -o $filenameStitched
 
     Write-Host -ForegroundColor Green "`nProcess Complete. " -NoNewline
     Write-Host "Video file here: " -NoNewline
