@@ -56,21 +56,22 @@ function captureUrl {
     # first open the browser and wait for selenium to have control
     startBrowser "https://www.microsoft.com/en-us/"
 
-    $recordLength = 5
+    $recordLength = 7
     $interimFileName_Raw = "$output.raw.mp4"
-    
+
     Write-Host "Starting record. Saving output to: " -NoNewline
     Write-Host $interimFileName_Raw -ForegroundColor Yellow
-    $minutes = [double](Get-Date -Format mm)
-    $seconds = [double](Get-Date -Format ss)
-    $milliseconds = [double](Get-Date -Format 0.fff)
-    $StopWatchStartTime = $minutes*60 + $seconds + $milliseconds
     $StopWatch1.Start()
 
     $recordProcess = recordPrimaryMonitor -output $interimFileName_Raw -captureLength $recordLength
 
-    Start-Sleep 2 # arbitrary delay for the screen recording to actually kick in
+    Start-Sleep 3 # arbitrary delay for the screen recording to actually kick in
 
+    $curTime = Get-Date -Format mmssfff
+    $minutes = [double]($curTime.SubString(0,2))
+    $seconds = [double]($curTime.SubString(2,2))
+    $milliseconds = [double](-join("0.", $curTime.SubString(4,3)))
+    $openUrlCallTime = $minutes*60 + $seconds + $milliseconds
     Write-Host "Opening site: " -NoNewline
     Write-Host $url
     loadUrl -url $url
@@ -103,15 +104,14 @@ function captureUrl {
     $seconds = [double]($recordingStartTime.SubString(2,2))
     $milliseconds = [double]("0."+$recordingStartTime.SubString(5,3))
 
-    Write-Host "ffmpeg started at: $StopWatchStartTime"
-
     $recordingStartTime = $minutes*60 + $seconds + $milliseconds
     Write-Host "Recording started at: $recordingStartTime"
+    Write-Host "Url call was at: $openUrlCallTime"
 
-    $ffmpegSetupTime = $recordingStartTime - $StopWatchStartTime - 0.5
-    Write-Host "ffmpeg setup time was: $ffmpegSetupTime"
+    $ffmpegSetupTime = $openUrlCallTime - $recordingStartTime
+    Write-Host "ffmpeg setup time was therefore: $ffmpegSetupTime"
 
-    Write-Host "`nTrimming video per ffmpeg startup time"
+    Write-Host "`nTrimming $ffmpegSetupTime (s) from video to compensate for ffmpeg startup time"
     $interimFileName_Trimmed = "$output.trimmed.mp4"
     ffmpeg -i $interimFileName_Raw -loglevel error -ss "00:00:$ffmpegSetupTime" -async 1 $interimFileName_Trimmed
     Write-Host "Trimming complete." -ForegroundColor Green
