@@ -93,6 +93,12 @@ function captureUrl {
     # $totalElapsedTime = $StopWatch1.Elapsed.TotalSeconds;
     Write-Host "Recording complete." -ForegroundColor Green
 
+    # clean up the browser
+    closeBrowser
+
+    # clean up timer
+    $StopWatch1.Reset()
+
     $interimFileName_Raw_Esc = $interimFileName_Raw -replace '[\\]','\$&' # do some escaping
     Write-Host $interimFileName_Raw_Esc
 
@@ -119,15 +125,9 @@ function captureUrl {
     # Write-Host "Applying overlays"
     # $interimFileName_Overlays = $output + ".overlays.mp4"
     Write-Host "`nApplying video overlays"
-    $recordProcess = applyOverlaysOnTopOfVideo -in $interimFileName_Trimmed -out "$output.mp4" -text $overlayText #update output once there are more steps
+    $recordProcess = applyOverlaysOnTopOfVideo -in $interimFileName_Trimmed -out "$output.mp4" -title $overlayText #update output once there are more steps
     Wait-Process -Id $recordProcess.Id
     Write-Host "Overlays complete." -ForegroundColor Green
-
-    # clean up the browser
-    closeBrowser
-
-    # clean up timer
-    $StopWatch1.Reset()
 }
 
 function capture2x2 {

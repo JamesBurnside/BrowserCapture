@@ -19,15 +19,24 @@ function applyOverlaysOnTopOfVideo {
     Param(
         [Parameter(mandatory=$true)][string] $in,
         [Parameter(mandatory=$true)][string] $out,
-        [string] $text
+        [string] $title
     )
 
     $assetsFolder = $PSScriptRoot+"\..\assets";
 
-    if($text) {
+    if($title) {
         $fontDir = $assetsFolder+"\fonts"
         $fontFile = $fontDir+"\Gidole-Regular.ttf";
         $fontFile = $fontFile -replace '[\\:]','\$&' # do some escaping
-        startInNewProc "ffmpeg -loglevel error -i '$in' -vf drawtext=\`"fontfile='$fontFile': text='$text': fontcolor=white: fontsize=110: box=1: boxcolor=black@0.7: boxborderw=5: x=(w-tw)/2: y=(h-th)*0.9\`" '$out'"
+        $ffmpegCmd = -join("ffmpeg -loglevel error",
+            " -i '$in'",
+            " -vf drawtext=\`"",
+                "fontfile='$fontFile':",
+                "text='$title':",
+                "fontcolor=white: fontsize=110:",
+                "box=1: boxcolor=black@0.7: boxborderw=5:",
+                "x=(w-tw)/2: y=(h-th)*0.9\`"",
+            " '$out'")
+        startInNewProc $ffmpegCmd
     }
 }
