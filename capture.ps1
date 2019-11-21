@@ -212,8 +212,11 @@ function main {
     If ($choosenCaptureOptions.Count -eq 2) {
         capture2x2 $interimFileDir $choosenCaptureOptions[0].url $choosenCaptureOptions[0].text $choosenCaptureOptions[1].url $choosenCaptureOptions[1].text $output
     }
-    ElseIf ($choosenCaptureOptions.Count -eq 4) {
-        capture2x2 $interimFileDir $choosenCaptureOptions[0].url $choosenCaptureOptions[0].text $choosenCaptureOptions[1].url $choosenCaptureOptions[1].text $choosenCaptureOptions[2].url $choosenCaptureOptions[2].text $choosenCaptureOptions[3].url $choosenCaptureOptions[3].text $output
+    ElseIf (($choosenCaptureOptions.Count -eq 4)) {
+        capture4x4 $interimFileDir $choosenCaptureOptions[0].url $choosenCaptureOptions[0].text $choosenCaptureOptions[1].url $choosenCaptureOptions[1].text $choosenCaptureOptions[2].url $choosenCaptureOptions[2].text $choosenCaptureOptions[3].url $choosenCaptureOptions[3].text $output
+    }
+    ElseIf (($choosenCaptureOptions.Count -eq 0)) {
+        capture4x4 $interimFileDir $availableCaptureOptions[0].url $availableCaptureOptions[0].text $availableCaptureOptions[1].url $availableCaptureOptions[1].text $availableCaptureOptions[2].url $availableCaptureOptions[2].text $availableCaptureOptions[3].url $availableCaptureOptions[3].text $output
     }
     Else {
         Write-Error "Number of capture options must be 2 or 4"
