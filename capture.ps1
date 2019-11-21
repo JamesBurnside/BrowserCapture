@@ -3,7 +3,8 @@ Param(
     [bool] $csr = 0,
     [bool] $ssr = 0,
     [bool] $dssrcold = 0,
-    [bool] $dssrwarm = 0
+    [bool] $dssrwarm = 0,
+    [bool] $perfmarkers = 1
 )
 
 class captureOption {
@@ -67,17 +68,19 @@ function captureUrl {
     Write-Host $url
     loadUrl -url $url
 
-    listenForElementById "exp1"
-    $ttfb = $StopWatch1.Elapsed.TotalSeconds;
-    Write-Host "ttfb: $ttfb"
+    if ($perfmarkers) {
+        listenForElementById "exp1"
+        $ttfb = $StopWatch1.Elapsed.TotalSeconds;
+        Write-Host "ttfb: $ttfb"
 
-    listenForElementByClass "spotlight0"
-    $ttvr = $StopWatch1.Elapsed.TotalSeconds;
-    Write-Host "ttvr: $ttvr"
+        listenForElementByClass "spotlight0"
+        $ttvr = $StopWatch1.Elapsed.TotalSeconds;
+        Write-Host "ttvr: $ttvr"
 
-    # listenForElementByClass "spotlight5"
-    # $tti = $StopWatch1.Elapsed.TotalSeconds;
-    # Write-Host "tti: $tti"
+        # listenForElementByClass "spotlight5"
+        # $tti = $StopWatch1.Elapsed.TotalSeconds;
+        # Write-Host "tti: $tti"
+    }
 
     Write-Host "Waiting for recording to complete."
     Wait-Process -Id $recordProcess.Id
@@ -115,14 +118,18 @@ function captureUrl {
     Write-Host "Trimming complete." -ForegroundColor Green
 
     Write-Host "`nApplying video overlays"
-    $tti = 1.5
-    $ttfb_with_buffer = $ttfb + $visualPrependBuffer
-    $ttvr_with_buffer = $ttvr + $visualPrependBuffer
-    $tti_with_buffer = $tti + $visualPrependBuffer
-    $ttfb = -join($ttfb,"s")
-    $ttvr = -join($ttvr,"s")
-    $tti = -join($tti,"s")
-    $recordProcess = applyOverlaysOnTopOfVideo $interimFileName_Trimmed "$output.mp4" $overlayText "ttfb $ttfb" $ttfb_with_buffer "ttvr $ttvr" $ttvr_with_buffer "tti $tti" $tti_with_buffer
+    If ($perfmarkers) {
+        $tti = 1.5
+        $ttfb_with_buffer = $ttfb + $visualPrependBuffer
+        $ttvr_with_buffer = $ttvr + $visualPrependBuffer
+        $tti_with_buffer = $tti + $visualPrependBuffer
+        $ttfb = -join($ttfb,"s")
+        $ttvr = -join($ttvr,"s")
+        $tti = -join($tti,"s")
+        $recordProcess = applyOverlaysOnTopOfVideo $interimFileName_Trimmed "$output.mp4" $overlayText "ttfb $ttfb" $ttfb_with_buffer "ttvr $ttvr" $ttvr_with_buffer "tti $tti" $tti_with_buffer
+    } Else {
+        $recordProcess = applyOverlaysOnTopOfVideo $interimFileName_Trimmed "$output.mp4" $overlayText
+    }
 
     Wait-Process -Id $recordProcess.Id
     Write-Host "Overlays complete." -ForegroundColor Green
