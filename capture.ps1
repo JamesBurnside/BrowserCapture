@@ -4,7 +4,7 @@ Param(
     [bool] $ssr = 0,
     [bool] $dssrcold = 0,
     [bool] $dssrwarm = 0,
-    [bool] $perfmarkers = 1
+    [bool] $perfmarkers = 0
 )
 
 class captureOption {

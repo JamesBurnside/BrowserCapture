@@ -31,7 +31,7 @@ This uses ffmpeg for screen recording and video creating, and selenium web drive
   * -dssrcold (delayed server side rendered with a cold cache)
   * -dssrwarm (delayed server side rendered with a warm cache)
 
-* Can choose to enable/disable perf markers with -perfmarkers (enabled by default)
+* Can choose to enable/disable perf markers with -perfmarkers (currently disabled by default)
   * tti is still in TODO
 
 ## Immediate Todos
