@@ -2,8 +2,8 @@ Param(
     # options to capture
     [bool] $csr = 0,
     [bool] $ssr = 0,
-    [bool] $dssrcold = 0,
-    [bool] $dssrwarm = 0,
+    # [bool] $dssrcold = 0,
+    # [bool] $dssrwarm = 0,
     [bool] $perfmarkers = 0
 )
 
@@ -18,10 +18,10 @@ class captureOption {
 }
 
 $availableCaptureOptions = (
-    @([captureOption]::new("https://int.msn.com/ssr/?item=spalink:20191118.147&csr=true", "CSR")),
-    @([captureOption]::new("https://int.msn.com/ssr/?item=spalink:20191118.147&prerender=true", "SSR Prerender")),
-    @([captureOption]::new("https://int.msn.com/ssr/?item=spalink:20191118.147&delayed=true", "DSSR Cold Cache")),
-    @([captureOption]::new("https://int.msn.com/ssr/?item=spalink:20191118.147&delayed=true&cache=warm", "DSSR Warm Cache"))
+    @([captureOption]::new("https://int.msn.com/render?entry=/bundles/v1/hub-ssr/20200211.76/node.index.js&mockpcs=true", "CSR")),
+    @([captureOption]::new("https://int.msn.com/render?entry=/bundles/v1/hub-ssr/20200211.76/node.index.js&mockpcs=true&csrdelay=250", "SSR")),
+    @([captureOption]::new("", "DSSR Cold Cache")),
+    @([captureOption]::new("", "DSSR Warm Cache"))
 )
 
 # Load scripts
@@ -205,8 +205,8 @@ function main {
     $choosenCaptureOptions = @()
     If ($csr) { $choosenCaptureOptions += $availableCaptureOptions[0] }
     If ($ssr) { $choosenCaptureOptions += $availableCaptureOptions[1] }
-    If ($dssrcold) { $choosenCaptureOptions += $availableCaptureOptions[2] }
-    If ($dssrwarm) { $choosenCaptureOptions += $availableCaptureOptions[3] }
+    # If ($dssrcold) { $choosenCaptureOptions += $availableCaptureOptions[2] }
+    # If ($dssrwarm) { $choosenCaptureOptions += $availableCaptureOptions[3] }
 
     # check if doing 2x2 or 4x4 or the default
     If ($choosenCaptureOptions.Count -eq 2) {
@@ -216,7 +216,8 @@ function main {
         capture4x4 $interimFileDir $choosenCaptureOptions[0].url $choosenCaptureOptions[0].text $choosenCaptureOptions[1].url $choosenCaptureOptions[1].text $choosenCaptureOptions[2].url $choosenCaptureOptions[2].text $choosenCaptureOptions[3].url $choosenCaptureOptions[3].text $output
     }
     ElseIf (($choosenCaptureOptions.Count -eq 0)) {
-        capture4x4 $interimFileDir $availableCaptureOptions[0].url $availableCaptureOptions[0].text $availableCaptureOptions[1].url $availableCaptureOptions[1].text $availableCaptureOptions[2].url $availableCaptureOptions[2].text $availableCaptureOptions[3].url $availableCaptureOptions[3].text $output
+        # capture4x4 $interimFileDir $availableCaptureOptions[0].url $availableCaptureOptions[0].text $availableCaptureOptions[1].url $availableCaptureOptions[1].text $output
+        capture2x2 $interimFileDir $availableCaptureOptions[0].url $availableCaptureOptions[0].text $availableCaptureOptions[1].url $availableCaptureOptions[1].text $output
     }
     Else {
         Write-Error "Number of capture options must be 2 or 4"
@@ -225,7 +226,7 @@ function main {
 
     # create a slow output also
     $slowOutputFile = "$output.slowed.mp4"
-    $slowAmount = 3
+    $slowAmount = 7
     Write-Host "`n===Creating slowed down version===";
     $slowDownString = 'setpts='+$slowAmount+'*PTS'
     ffmpeg -loglevel error -i $output -filter:v $slowDownString $slowOutputFile
