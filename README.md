@@ -24,6 +24,13 @@ This uses ffmpeg for screen recording and video creating, and selenium web drive
 * Clone repo
 * run `./capture.ps1`
 
+You may see the error:
+``` shell
+<PATH>\webdrivers\chromedriver.exe\chromedriver.exe does not exist. The driver can be downloaded at http://chromedriver.storage.googleapis.com/index.html"
+```
+
+Just make sure that the chromedriver.exe exists in the expected path.
+
 ### Change URLs and subtitle text to capture
 
 Near the top of `capture.ps1` see:
@@ -50,6 +57,7 @@ Include only 2 to do a 2x2 capture. Include 4 to do a 4x4 capture.
 * Fix perf markers
   * ttfb seems wrong for SSR
   * tti is not implemented
+* Fix to work with Ege Chromium
 
 ## Possible Future Todos
 * Perform n runs and choose median to minimize external factors
