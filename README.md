@@ -24,12 +24,24 @@ This uses ffmpeg for screen recording and video creating, and selenium web drive
 * Clone repo
 * run `./capture.ps1`
 
+### Change URLs and subtitle text to capture
+
+Near the top of `capture.ps1` see:
+``` ps
+$availableCaptureOptions = (
+    @([captureOption]::new("https://int.msn.com/render?entry=/bundles/v1/hub-ssr/20200211.76/node.index.js&mockpcs=true", "CSR")),
+    @([captureOption]::new("https://int.msn.com/render?entry=/bundles/v1/hub-ssr/20200211.76/node.index.js&mockpcs=true&csrdelay=250", "SSR"))
+    # Add these back in to do 4x4 capture
+    # @([captureOption]::new("<site url>", "Capture 3")),
+    # @([captureOption]::new("<site url>", "Capture 4"))
+)
+```
+
+Change these urls and text strings to change the testing urls and subtitle text.
+
+Include only 2 to do a 2x2 capture. Include 4 to do a 4x4 capture.
+
 ### Parameters
-* Can choose which of the following to capture (captures all by default, must choose two or four):
-  * -csr (client side rendering)
-  * -ssr (server side rendered, precached)
-  * -dssrcold (delayed server side rendered with a cold cache)
-  * -dssrwarm (delayed server side rendered with a warm cache)
 
 * Can choose to enable/disable perf markers with -perfmarkers (currently disabled by default)
   * tti is still in TODO

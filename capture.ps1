@@ -1,9 +1,5 @@
 Param(
     # options to capture
-    [bool] $csr = 0,
-    [bool] $ssr = 0,
-    # [bool] $dssrcold = 0,
-    # [bool] $dssrwarm = 0,
     [bool] $perfmarkers = 0
 )
 
@@ -19,9 +15,10 @@ class captureOption {
 
 $availableCaptureOptions = (
     @([captureOption]::new("https://int.msn.com/render?entry=/bundles/v1/hub-ssr/20200211.76/node.index.js&mockpcs=true", "CSR")),
-    @([captureOption]::new("https://int.msn.com/render?entry=/bundles/v1/hub-ssr/20200211.76/node.index.js&mockpcs=true&csrdelay=250", "SSR")),
-    @([captureOption]::new("", "DSSR Cold Cache")),
-    @([captureOption]::new("", "DSSR Warm Cache"))
+    @([captureOption]::new("https://int.msn.com/render?entry=/bundles/v1/hub-ssr/20200211.76/node.index.js&mockpcs=true&csrdelay=250", "SSR"))
+    # Add these back in to do 4x4 capture
+    # @([captureOption]::new("<site url>", "Capture 3")),
+    # @([captureOption]::new("<site url>", "Capture 4"))
 )
 
 # Load scripts
@@ -202,22 +199,12 @@ function main {
 
     $output = $outputDir+"\comparison.mp4"
 
-    $choosenCaptureOptions = @()
-    If ($csr) { $choosenCaptureOptions += $availableCaptureOptions[0] }
-    If ($ssr) { $choosenCaptureOptions += $availableCaptureOptions[1] }
-    # If ($dssrcold) { $choosenCaptureOptions += $availableCaptureOptions[2] }
-    # If ($dssrwarm) { $choosenCaptureOptions += $availableCaptureOptions[3] }
-
     # check if doing 2x2 or 4x4 or the default
-    If ($choosenCaptureOptions.Count -eq 2) {
-        capture2x2 $interimFileDir $choosenCaptureOptions[0].url $choosenCaptureOptions[0].text $choosenCaptureOptions[1].url $choosenCaptureOptions[1].text $output
-    }
-    ElseIf (($choosenCaptureOptions.Count -eq 4)) {
-        capture4x4 $interimFileDir $choosenCaptureOptions[0].url $choosenCaptureOptions[0].text $choosenCaptureOptions[1].url $choosenCaptureOptions[1].text $choosenCaptureOptions[2].url $choosenCaptureOptions[2].text $choosenCaptureOptions[3].url $choosenCaptureOptions[3].text $output
-    }
-    ElseIf (($choosenCaptureOptions.Count -eq 0)) {
-        # capture4x4 $interimFileDir $availableCaptureOptions[0].url $availableCaptureOptions[0].text $availableCaptureOptions[1].url $availableCaptureOptions[1].text $output
+    If ($availableCaptureOptions.Count -eq 2) {
         capture2x2 $interimFileDir $availableCaptureOptions[0].url $availableCaptureOptions[0].text $availableCaptureOptions[1].url $availableCaptureOptions[1].text $output
+    }
+    ElseIf (($availableCaptureOptions.Count -eq 4)) {
+        capture4x4 $interimFileDir $availableCaptureOptions[0].url $availableCaptureOptions[0].text $availableCaptureOptions[1].url $availableCaptureOptions[1].text $availableCaptureOptions[2].url $availableCaptureOptions[2].text $availableCaptureOptions[3].url $availableCaptureOptions[3].text $output
     }
     Else {
         Write-Error "Number of capture options must be 2 or 4"
